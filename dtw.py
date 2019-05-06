@@ -14,10 +14,10 @@ options:
 
 import numpy as np
 import scipy as sp
+import scipy.spatial
 import matplotlib.pyplot as plt
 
 def dtw(ts1=[], ts2=[]):
-
     m = len(ts1)
     n = len(ts2)
     DTW = np.zeros((n, m), dtype=float)
@@ -82,9 +82,15 @@ Adapated from https://github.com/pierre-rouanet/dtw/blob/master/dtw/dtw.py and o
 2 times faster than "dtw"
 """
 def fastdtw(ts1=[], ts2=[]):
+    print("ts1:"+str(ts1))
+    print("ts2:"+str(ts2))
+    
     m = len(ts1)
     n = len(ts2)
-
+    print("m"+str(m)+"n"+str(n))
+    
+    if n != m:
+        raise ValueError("Feature vectors must have the same number of columns!");
     DTW = np.zeros((m + 1, n + 1), dtype=float)
 
     # set first row (apart from 1st element) to infinity
