@@ -16,6 +16,7 @@ import numpy as np
 import scipy as sp
 import scipy.spatial
 import matplotlib.pyplot as plt
+import math
 
 def dtw(ts1=[], ts2=[]):
     m = len(ts1)
@@ -82,12 +83,12 @@ Adapated from https://github.com/pierre-rouanet/dtw/blob/master/dtw/dtw.py and o
 2 times faster than "dtw"
 """
 def fastdtw(ts1=[], ts2=[]):
-    print("ts1:"+str(ts1))
-    print("ts2:"+str(ts2))
+    #print("ts1:"+str(ts1))
+    #print("ts2:"+str(ts2))
     
     m = len(ts1)
     n = len(ts2)
-    print("m"+str(m)+"n"+str(n))
+    #print("m"+str(m)+"n"+str(n))
     
     if n != m:
         raise ValueError("Feature vectors must have the same number of columns!");
@@ -150,3 +151,40 @@ def fastdtw(ts1=[], ts2=[]):
 
 def distance(featureVector1, featureVector2):
     return np.linalg.norm(featureVector1 - featureVector2)
+
+def matrix(n, m=None, default=0):
+    m = m or n
+    return np.asarray([[default] * m for _ in range(n)])
+
+
+def sakoeChibaDTW(s, t,w):
+    n, m = len(s), len(t)
+    w = abs(n - m) + w
+    dtw = matrix(n, m, default=math.inf)
+    dtw[0][0] = 0
+
+    for i in range(1, n):
+        min_row_score = math.inf
+        for j in range(max(1, i-w), min(m, i+w)):
+            cost = distance(s[i], t[j])
+            dtw[i][j] = cost + min(dtw[i-1][j], dtw[i][j-1], dtw[i-1][j-1])
+            min_row_score = min(min_row_score, dtw[i][j])
+    return dtw[-1][-1]
+
+def sakoeChibaDTW2(s, t,w):
+    n, m = len(s), len(t)
+    w = abs(n - m) + w
+    dtw = matrix(n, m, default=math.inf)
+    #dtw = np.zeros((m+1, n+1), dtype=float)
+    dtw[0][0] = 0
+
+    for i in range(1, n):
+        min_row_score = math.inf
+        for j in range(max(1, i-w), min(m, i+w)):
+            cost = distance(s[i], t[j])
+            dtw[i][j] = cost + min(dtw[i-1][j], dtw[i][j-1], dtw[i-1][j-1])
+            min_row_score = min(min_row_score, dtw[i][j])
+    return dtw[-1][-1]
+
+
+    
